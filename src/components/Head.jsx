@@ -1,8 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { toggleMenu } from '../utils/appSlice';
+import { YOUTUBE_SEARCH_API } from '../utils/constants';
 
 const Head = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestion, setSuggestion] = useState([]);
+  const [showSuggestion, setShowSuggestion] = useState(false);
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => getSearchSuggestion(), 200);
+
+    return () =>{
+      clearTimeout(timer);
+    }
+    
+  },[searchQuery]);
+
+  const getSearchSuggestion = async ()=>{
+    const data = await fetch(YOUTUBE_SEARCH_API+ searchQuery)
+    const json = await data.json();
+    setSuggestion(json[1]);
+  }
+  
   const diaptach = useDispatch();
   const toggleMenuHandler = () => {
     diaptach(toggleMenu())
@@ -26,12 +47,27 @@ const Head = () => {
 
         <div className='col-span-10'>
             <input 
-            className='w-1/2 border border-gray-500 py-1 rounded-l-full'
-            type="text"/>
+            className='px-5 w-1/2 border border-gray-500 py-1 rounded-l-full'
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setShowSuggestion(true)}
+            onBlur={() => setShowSuggestion(false)}
+            />
             <button
             className='border border-gray-500 py-1 px-4 rounded-r-full bg-gray-100'
             >🔍</button>
+
+        {showSuggestion && ( 
+          <div className='fixed bg-white border border-gray-100 px-2 py-1 w-[29.5rem] rounded-lg shadow-lg'>
+          <ul>
+            {suggestion.map(s => 
+            <li key={s} className='py-1 shadow-sm hover:bg-gray-100 rounded-lg'>🔎 {s}</li>)}
+        
+          </ul>
+        </div>)}
         </div>
+        
 
         <div className='col-span-1'>
             <img 
