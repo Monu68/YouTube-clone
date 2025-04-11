@@ -10,8 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-constants.jsx
 *.local
+constants.js
 
 # Editor directories and files
 .vscode/*
